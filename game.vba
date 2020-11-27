@@ -161,15 +161,28 @@ Sub GraySelection()
         .PatternTintAndShade = 0
     End With
 End Sub
-Sub removeColor()
+
+
+Sub setupSheet()
+    ActiveSheet.Name = "front"
+    Sheets.Add After:=ActiveSheet
+    Sheets("Sheet1").Name = "testing"
+End Sub
+
+Sub b2k21()
 '
-' removeColor Macro
+' b2k21 Macro
 '
 
 '
-    With Selection.Interior
-        .Pattern = xlNone
-        .TintAndShade = 0
-        .PatternTintAndShade = 0
-    End With
+    Range("B2").Select
+    ActiveCell.FormulaR1C1 = "0"
+    Range("B2").Select
+    Selection.AutoFill Destination:=Range("B2:K2"), Type:=xlFillDefault
+    Range("B2:K2").Select
+    Range("B2:K2").Select
+    Selection.AutoFill Destination:=Range("B2:K21"), Type:=xlFillDefault
+    Range("B2:K21").Select
+    Range("L21").Select
 End Sub
+
