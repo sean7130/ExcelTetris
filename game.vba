@@ -14,8 +14,9 @@ Public Sub Example()
      QueryPerformanceFrequency TickFrequency
      
      QueryPerformanceCounter StartTime
-     Sleep 2
      QueryPerformanceCounter EndTime
+     
+     MsgBox TickFrequency
      
      MsgBox "Elapsed time: " & 1000 * (EndTime - StartTime) / TickFrequency & "ms" 'scaled to milliseconds
 End Sub
@@ -33,10 +34,21 @@ Sub Main()
     Call board_demostrator
     
     Dim i As Integer
+    Dim diff As Long
+    Dim EndTime As Currency
+    Dim StartTime As Currency
+    Dim TickFrequency As Currency
+
+    QueryPerformanceFrequency TickFrequency
+    
     i = 0
     Dim dead As Boolean
     dead = False
     While Not dead
+        QueryPerformanceCounter StartTime
+        QueryPerformanceCounter EndTime
+        'MsgBox (EndTime - StartTime) / TickFrequency
+    
         i = i + 1
         If i = 10 Then
             dead = True
@@ -46,6 +58,27 @@ Sub Main()
     
 End Sub
 
+Sub reset_all()
+    Call zero_data
+    Call update_front_from_data
+End Sub
+
+Sub zero_data()
+    Sheets("data").Range(Sheets("data").Cells(2, "b"), Sheets("data").Cells(21, "k")).Value = 0
+End Sub
+
+Sub update_front_from_data()
+    Dim i As Byte
+    Dim j As Byte
+    Dim this_val As Byte
+    
+    For i = 2 To 21
+        For j = 2 To 11
+            Call updateBoardAbs(j, i, Sheets("data").Cells(i, j).Value)
+        Next
+    Next
+    
+End Sub
 
 Sub board_demostrator()
 '
@@ -92,22 +125,28 @@ Sub CondFormat()
     Range("B2:K21").Select
 End Sub
 
-Sub testUBA()
-    Call updateBoardAbs(3, 8, 1)
-    
 
-End Sub
-
+Function moveBlock(x, y, delta_x, delta_y)
+    Dim val As Integer
+    val = Sheets("data").Cells(y, x).Value
+    Call updateBoardAbs(x, y, 0)
+    Call updateBoardAbs(x + delta_x, y + delta_y, val)
+End Function
 
 Function updateBoardAbs(x, y, val)
     ' function does the follow two tasks:
     ' update visuals for the front
     ' write data at the back
+    
+    'val: 1 is gray
+    'val: 2 is black
+    'val: 0 is nothing
+    
     If x < 2 Then
         MsgBox "updateBoardAbs: X cannot be smaller than 2"
         Exit Function
-    ElseIf x > 10 Then
-        MsgBox "updateBoardAbs: X cannot be greater than 10"
+    ElseIf x > 11 Then
+        MsgBox "updateBoardAbs: X cannot be greater than 11"
         Exit Function
     End If
     
@@ -129,6 +168,7 @@ Function updateBoardAbs(x, y, val)
             .TintAndShade = 0.5
             .PatternTintAndShade = 0
         End With
+        '
     ElseIf val = 2 Then
             With Sheets("front").Cells(y, x).Interior
             .Pattern = xlSolid
@@ -144,6 +184,9 @@ Function updateBoardAbs(x, y, val)
             .PatternTintAndShade = 0
         End With
     End If
+    
+    'Updates: data with the correct data
+    'Sheets("data").Cells(y, x).Value = "testing"
     
 
 End Function
@@ -161,8 +204,6 @@ Sub GraySelection()
         .PatternTintAndShade = 0
     End With
 End Sub
-
-
 Sub setupSheet()
     ActiveSheet.Name = "front"
     Sheets.Add After:=ActiveSheet
