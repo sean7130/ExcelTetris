@@ -124,7 +124,32 @@ Sub CondFormat()
 '
     Range("B2:K21").Select
 End Sub
+Function moveAllMovableDownwards()
+' This function moves all the blocks that should be moved:
+' Which are the blocks assoicated with datavalue == 1
 
+    Dim i As Byte
+    Dim j As Byte
+    
+    Dim row_idx As Byte
+    Dim col_idx As Byte
+    
+    ' goal is to iterate backwards from 21 to 2 for row
+    ' and then iterate backwards from 11 to 2 for columns
+    For i = 0 To 19
+        For j = 0 To 9
+        row_idx = 21 - i
+        col_idx = 11 - j
+        If Sheets("data").Cells(row_idx, col_idx).Value = 1 Then
+            Call moveBlock(col_idx, row_idx, 0, 1)
+            
+        End If
+            
+        Next
+    Next
+
+
+End Function
 
 Function moveBlock(x, y, delta_x, delta_y)
     Dim val As Integer
